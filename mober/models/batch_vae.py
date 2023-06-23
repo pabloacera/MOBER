@@ -66,7 +66,10 @@ class Decoder(nn.Module):
         self.fc5 = nn.Linear(128, 256)
         self.bn5 = nn.BatchNorm1d(256, momentum=0.01, eps=0.001)
 
-        self.out_fc = nn.Linear(256, n_genes)
+        #self.out_fc = nn.Linear(256, n_genes)
+        
+        self.out_n = nn.Softplus(256, n_genes)
+        self.out_p = nn.Sigmoid(256, n_genes)
 
 
     def forward(self, z, batch):
@@ -85,10 +88,12 @@ class Decoder(nn.Module):
         dec = self.fc5(dec)
         dec = self.bn5(dec)
         dec = self.activation(dec)
-        dec = self.final_activation(self.out_fc(dec))
         
-        return dec
-
+        #dec = self.final_activation(self.out_fc(dec))
+        n = self.out_n(dec)
+        p = self.out_p(dec)
+        
+        return n , p
 
 class BatchVAE(nn.Module):
     """
@@ -96,7 +101,7 @@ class BatchVAE(nn.Module):
     Encoder is composed of 3 FC layers.
     Decoder is symmetrical to encoder + Batch input.
     """
-
+    
     def __init__(self, n_genes, enc_dim, n_batch):
         super().__init__()
 
@@ -105,6 +110,19 @@ class BatchVAE(nn.Module):
 
     def forward(self, x, batch):
         means, stdev, enc = self.encoder(x)
-        dec = self.decoder(enc, batch)
+        n, p = self.decoder(enc, batch)
+        dec =  torch.stack((n, p), dim=1)
         
         return dec, enc, means, stdev
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

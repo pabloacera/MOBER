@@ -33,7 +33,7 @@ def decode(data_loader, model, device,decimals):
             batch = batch.to(device)
             dec, enc = model(data, batch)[:2]
             encoded.append(enc)
-            decoded.append(dec)  
+            decoded.append(dec)
     
     encoded = torch.cat(encoded,dim=0).detach().cpu().numpy().round(decimals=decimals)
     decoded = torch.cat(decoded,dim=0).detach().cpu().numpy().round(decimals=decimals)
@@ -53,7 +53,7 @@ def load_model(model_dir, device):
                                          filename=os.path.join(model_dir,'batch_ae_final.model'))
     return model, features, label_encode
 
-def do_projection(model,adata, onto, label_encode, device, decimals=4, batch_size=1600, use_sparse_mat=False):
+def do_projection(model, adata, onto, label_encode, device, decimals=4, batch_size=1600, use_sparse_mat=False):
 
     label = np.array([label_encode[onto].values for _ in range(adata.shape[0])])
     
@@ -70,7 +70,7 @@ def do_projection(model,adata, onto, label_encode, device, decimals=4, batch_siz
     if use_sparse_mat: proj_adata = sc.AnnData(csr_matrix(projected),obs=adata.obs,var=adata.var)
     else:  proj_adata = sc.AnnData(projected,obs=adata.obs,var=adata.var)
     proj_adata.obs['projected_onto'] = onto
-    z_adata    = sc.AnnData(z, obs=adata.obs,var=pd.DataFrame(index=[f'z_{i}' for i in range(z.shape[1])])) 
+    z_adata = sc.AnnData(z, obs=adata.obs,var=pd.DataFrame(index=[f'z_{i}' for i in range(z.shape[1])])) 
     
     return proj_adata, z_adata
     

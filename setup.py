@@ -5,18 +5,16 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='mober',
-    version='2.0.0',
+    name='mober_2',
+    version='2.0.1',
     url='ssh://git@bitbucket.prd.nibr.novartis.net/ods/ods-mober.git',
-    author='mober team',
-    author_email='gang-6.li@novartis.com',
-    description='mober',
-    packages=find_packages(),    
+    description='Modified mober',
+    packages=find_packages(),
     install_requires=['mlflow', 'scanpy'],
     
     keywords='mober',
 
     entry_points={
-        'console_scripts': ['mober = mober.mober:main']
+        'console_scripts': ['mober_2 = mober.mober:main']
     }
 )

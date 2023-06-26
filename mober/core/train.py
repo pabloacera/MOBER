@@ -2,6 +2,11 @@ import os
 import time
 import torch
 
+# to run the training script using mober.py change 
+# from mober.core import utils
+# for 
+# from .core import utils
+
 from mober.core import utils
 from mober.core import data_utils
 from mober.models import utils as model_utils
@@ -53,7 +58,7 @@ def validation(model_BatchAE,model_src_adv,val_loader,device, args, log, src_wei
             epoch_src_adv_loss_val += loss_src_adv.detach().item()
             epoch_tot_loss_val += loss_ae.detach().item()
 
-    log.log_metric("val_loss_ae" , epoch_ae_loss_val      / len(val_loader.dataset), epoch)
+    log.log_metric("val_loss_ae_NB_NLL" , epoch_ae_loss_val      / len(val_loader.dataset), epoch)
     log.log_metric("val_loss_adv", epoch_src_adv_loss_val / len(val_loader.dataset), epoch)
     log.log_metric("val_loss_tot", epoch_tot_loss_val     / len(val_loader.dataset), epoch)
     
@@ -118,10 +123,9 @@ def train_model(model_BatchAE,
             
             epoch_tot_loss += loss_ae.detach().item()
             
-        log.log_metric("train_loss_ae" , epoch_ae_loss      / len(train_loader.dataset), epoch)
+        log.log_metric("train_loss_NB_NLL" , epoch_ae_loss      / len(train_loader.dataset), epoch)
         log.log_metric("train_loss_adv", epoch_src_adv_loss / len(train_loader.dataset), epoch)
         log.log_metric("train_loss_tot", epoch_tot_loss     / len(train_loader.dataset), epoch)
-        
         
         # Validation
         if args.val_set_size != 0:
@@ -193,8 +197,6 @@ def main(args):
                                                                 label_encode.shape[0],
                                                                 lr=args.src_adv_lr,
                                                                 filename=None)
-
-    
     
     src_weights_src_adv = torch.tensor(
         data_utils.get_class_weights(adata.obs.data_source, args.balanced_sources_src_adv), dtype=torch.float).to(device)

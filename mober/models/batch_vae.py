@@ -59,8 +59,8 @@ class Decoder(nn.Module):
         super().__init__()
         self.activation = nn.SELU()
         #self.final_activation = nn.ReLU()
-        self.final_activation_n = nn.Softplus()
-        self.final_activation_p = nn.Sigmoid()
+        self.final_activation_mu = nn.Softplus()
+        self.final_activation_sigma = nn.Softplus()
         self.fcb = nn.Linear(n_batch, n_batch)
         self.bnb = nn.BatchNorm1d(n_batch, momentum=0.01, eps=0.001)
         self.fc4 = nn.Linear(enc_dim + n_batch, 128)
@@ -70,8 +70,8 @@ class Decoder(nn.Module):
 
         #self.out_fc = nn.Linear(256, n_genes)
 
-        self.out_n = nn.Linear(256, n_genes)
-        self.out_p = nn.Linear(256, n_genes)
+        self.out_mu = nn.Linear(256, n_genes)
+        self.out_sigma = nn.Linear(256, n_genes)
 
 
     def forward(self, z, batch):
@@ -92,8 +92,8 @@ class Decoder(nn.Module):
         dec = self.activation(dec)
         
         #dec = self.final_activation(self.out_fc(dec))
-        n = self.final_activation_n(self.out_n(dec))
-        p = self.final_activation_p(self.out_p(dec))
+        n = self.final_activation_mu(self.out_mu(dec))
+        p = self.final_activation_sigma(self.out_sigma(dec))
         
         return n, p
 

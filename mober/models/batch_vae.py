@@ -60,7 +60,7 @@ class Decoder(nn.Module):
         self.activation = nn.SELU()
         #self.final_activation = nn.ReLU()
         self.final_activation_mu = nn.Softplus()
-        self.final_activation_sigma = nn.Softplus()
+        self.final_activation_alpha = nn.Softplus()
         self.fcb = nn.Linear(n_batch, n_batch)
         self.bnb = nn.BatchNorm1d(n_batch, momentum=0.01, eps=0.001)
         self.fc4 = nn.Linear(enc_dim + n_batch, 128)
@@ -71,7 +71,7 @@ class Decoder(nn.Module):
         #self.out_fc = nn.Linear(256, n_genes)
 
         self.out_mu = nn.Linear(256, n_genes)
-        self.out_sigma = nn.Linear(256, n_genes)
+        self.out_alpha = nn.Linear(256, n_genes)
 
 
     def forward(self, z, batch):
@@ -92,10 +92,10 @@ class Decoder(nn.Module):
         dec = self.activation(dec)
         
         #dec = self.final_activation(self.out_fc(dec))
-        n = self.final_activation_mu(self.out_mu(dec))
-        p = self.final_activation_sigma(self.out_sigma(dec))
+        mu = self.final_activation_mu(self.out_mu(dec))
+        alpha = self.final_activation_alpha(self.out_alpha(dec))
         
-        return n, p
+        return mu, alpha
 
 class BatchVAE(nn.Module):
     """
@@ -112,8 +112,8 @@ class BatchVAE(nn.Module):
 
     def forward(self, x, batch):
         means, stdev, enc = self.encoder(x)
-        n, p = self.decoder(enc, batch)
-        dec =  torch.stack((n, p), dim=1)
+        mu, alpha = self.decoder(enc, batch)
+        dec =  torch.stack((mu, alpha), dim=1)
         
         return dec, enc, means, stdev
     

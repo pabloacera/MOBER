@@ -93,9 +93,9 @@ class Decoder(nn.Module):
         
         #dec = self.final_activation(self.out_fc(dec))
         mu = self.final_activation_mu(self.out_mu(dec))
-        alpha = self.final_activation_alpha(self.out_alpha(dec))
+        theta = self.final_activation_alpha(self.out_alpha(dec))
         
-        return mu, alpha
+        return mu, theta
 
 class BatchVAE(nn.Module):
     """
@@ -112,8 +112,8 @@ class BatchVAE(nn.Module):
 
     def forward(self, x, batch):
         means, stdev, enc = self.encoder(x)
-        mu, alpha = self.decoder(enc, batch)
-        dec =  torch.stack((mu, alpha), dim=1)
+        mu, theta = self.decoder(enc, batch)
+        dec =  torch.stack((mu, theta), dim=1)
         
         return dec, enc, means, stdev
     

@@ -38,21 +38,24 @@ class Encoder(nn.Module):
         enc = self.dp2(enc)
         
         means = self.linear_means(enc)
+        #print('means', means, torch.isnan(means).nonzero())
+        
         log_vars = self.linear_log_vars(enc)
+        #print('log_vars', log_vars, torch.isnan(log_vars).nonzero())
         
         stdev = torch.exp(0.5 * log_vars) + 1e-4
+        #print('stdev', stdev, torch.isnan(stdev).nonzero())
         z = self.reparameterize(means, stdev)
-
+        
         return means, stdev, z
-
+        
     def forward(self, x):
         return self.encode(x)
 
-    
+
 class Decoder(nn.Module):
     """
     A decoder model that takes the encodings and a batch (source) matrix and produces decodings.
-
     Made up of 3 FC layers.
     """
     def __init__(self, n_genes, enc_dim, n_batch):
@@ -116,9 +119,6 @@ class BatchVAE(nn.Module):
         dec =  torch.stack((mu, theta), dim=1)
         
         return dec, enc, means, stdev
-    
-    
-    
     
     
     

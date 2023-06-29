@@ -76,7 +76,6 @@ def train_model(model_BatchAE,
                 log,
                 args):
     
-    
     # Early stopping settings
     best_model_loss = np.inf
     waited_epochs = 0
@@ -117,7 +116,16 @@ def train_model(model_BatchAE,
             # Update ae
             model_BatchAE.zero_grad()
             loss_ae = v_loss - args.src_adv_weight * loss_src_adv
+            print(loss_ae)
             loss_ae.backward()
+            #Check for nan or inf/-inf values in the gradients
+            for name, param in model_BatchAE.named_parameters():
+                if param.grad is not None:
+                    if torch.isnan(param.grad).any():
+                        print(f'Gradient of {name} has nan values')
+                    if torch.isinf(param.grad).any():
+                        print(f'Gradient of {name} has inf or -inf values')
+
             epoch_ae_loss += v_loss.detach().item()
             optimizer_BatchAE.step()
             
@@ -130,7 +138,7 @@ def train_model(model_BatchAE,
         # Validation
         if args.val_set_size != 0:
             epoch_ae_loss_val = validation(model_BatchAE,model_src_adv,val_loader,device, args, log, src_weights_src_adv,epoch)
-
+            
             # Early stop
             if epoch_ae_loss_val < best_model_loss: # there is an improvement, update the best_val_loss and save the model
                 best_model_loss = epoch_ae_loss_val

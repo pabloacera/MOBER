@@ -170,7 +170,6 @@ def main():
     
     
     
-    
     ###################### Projection Mode #######################
     pparser = subparsers.add_parser('projection',help = 'Make projection')
     

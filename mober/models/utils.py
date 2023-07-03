@@ -16,7 +16,8 @@ def create_model(model_cls, device, *args, filename=None, lr=1e-3, **kwargs):
     :return:
     """
     model = model_cls(*args, **kwargs)
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    # added weight_decay
+    optimizer = optim.Adam(model.parameters(), lr=lr) 
     if filename is not None:
         checkpoint = torch.load(filename, map_location=torch.device("cpu"))
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])

@@ -283,10 +283,10 @@ def negative_binomial_loss_mu_theta(y_pred, y_true):
                     .log_prob(y_true)
                     )
     
-    NNL_NB_loss = torch.nan_to_num(NNL_NB_loss,
-                                   nan=1e-7, 
-                                   posinf=1e15, 
-                                   neginf=-1e15)
+    #NNL_NB_loss = torch.nan_to_num(NNL_NB_loss,
+    #                               nan=1e-7, 
+    #                               posinf=1e15, 
+    #                               neginf=-1e15)
     
     #torch.save(NNL_NB_loss, '/Users/paceramateos/projects/MOBER/output_MOBER_2/metrics/NNL_NB_loss.pt')
     
@@ -299,16 +299,19 @@ def loss_function_vae(dec, x, mu, stdev, kl_weight=1.0):
     mean = torch.zeros_like(mu)
     scale = torch.ones_like(stdev)
 
-    KLD = kl_divergence(Normal(mu, stdev), Normal(mean, scale)).mean(dim=1)
+    #KLD = kl_divergence(Normal(mu, stdev), Normal(mean, scale)).mean(dim=1)
+    KLD = kl_divergence(Normal(mu, stdev), Normal(mean, scale)).sum(dim=1)
     
     #reconst_loss = functional.mse_loss(dec, x, reduction='none').mean(dim=1)
     
-    NB_NLL = negative_binomial_loss_mu_theta(dec, x).mean(dim=1)
+    #NB_NLL = negative_binomial_loss_mu_theta(dec, x).mean(dim=1)
+    NB_NLL = negative_binomial_loss_mu_theta(dec, x).sum(dim=1)
     #print(torch.isnan(NB_NLL).nonzero())
     
     #print((NB_NLL + kl_weight * KLD).sum(dim=0))
     
-    return (NB_NLL + kl_weight * KLD).sum(dim=0)
+    #return (NB_NLL + kl_weight * KLD).sum(dim=0)
+    return (NB_NLL + kl_weight * KLD).mean(dim=0)
 
 
 

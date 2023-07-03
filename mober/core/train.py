@@ -106,6 +106,8 @@ def train_model(model_BatchAE,
             src_pred = model_src_adv(enc)
 
             loss_src_adv = loss_function_classification(src_pred, batch, src_weights_src_adv)
+            #print(loss_src_adv, 'loss_src_adv')
+            
             loss_src_adv.backward(retain_graph=True)
             epoch_src_adv_loss += loss_src_adv.detach().item()
             optimizer_src_adv.step()
@@ -116,8 +118,9 @@ def train_model(model_BatchAE,
             # Update ae
             model_BatchAE.zero_grad()
             loss_ae = v_loss - args.src_adv_weight * loss_src_adv
-            print(loss_ae)
+            #print(loss_ae, 'loss_ae')
             loss_ae.backward()
+            '''
             #Check for nan or inf/-inf values in the gradients
             for name, param in model_BatchAE.named_parameters():
                 if param.grad is not None:
@@ -125,6 +128,23 @@ def train_model(model_BatchAE,
                         print(f'Gradient of {name} has nan values')
                     if torch.isinf(param.grad).any():
                         print(f'Gradient of {name} has inf or -inf values')
+            '''
+                        
+            # Check if there is vanishing or exploding gradients
+            max_grad_norm = None
+            min_grad_norm = None
+            
+            # Calculate the gradients' norms
+            for name, param in model_BatchAE.named_parameters():
+                if param.requires_grad:
+                    grad_norm = param.grad.data.norm(2).item()
+                    if max_grad_norm is None or grad_norm > max_grad_norm:
+                        max_grad_norm = grad_norm
+                    if min_grad_norm is None or grad_norm < min_grad_norm:
+                        min_grad_norm = grad_norm
+            
+            print(f'Max Gradient Norm: {max_grad_norm}')
+            print(f'Min Gradient Norm: {min_grad_norm}')
 
             epoch_ae_loss += v_loss.detach().item()
             optimizer_BatchAE.step()
@@ -198,6 +218,7 @@ def main(args):
                                                                 label_encode.shape[0],
                                                                 lr=args.batch_ae_lr,
                                                                 filename=None)
+
 
     model_src_adv, optimizer_src_adv = model_utils.create_model(MLP,
                                                                 device,

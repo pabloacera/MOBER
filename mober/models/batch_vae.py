@@ -63,7 +63,7 @@ class Decoder(nn.Module):
         self.activation = nn.SELU()
         #self.final_activation = nn.ReLU()
         self.final_activation_mu = nn.Softplus()
-        self.final_activation_alpha = nn.Softplus()
+        self.final_activation_theta = nn.Softplus()
         self.fcb = nn.Linear(n_batch, n_batch)
         self.bnb = nn.BatchNorm1d(n_batch, momentum=0.01, eps=0.001)
         self.fc4 = nn.Linear(enc_dim + n_batch, 128)
@@ -72,9 +72,14 @@ class Decoder(nn.Module):
         self.bn5 = nn.BatchNorm1d(256, momentum=0.01, eps=0.001)
 
         #self.out_fc = nn.Linear(256, n_genes)
-
-        self.out_mu = nn.Linear(256, n_genes)
-        self.out_alpha = nn.Linear(256, n_genes)
+        self.fc5_mu = nn.Linear(256, 512)
+        self.bn5_mu = nn.BatchNorm1d(512, momentum=0.01, eps=0.001)
+        
+        self.fc5_theta = nn.Linear(256, 512)
+        self.bn5_theta = nn.BatchNorm1d(512, momentum=0.01, eps=0.001)
+        
+        self.out_mu = nn.Linear(512, n_genes)
+        self.out_alpha = nn.Linear(512, n_genes)
 
 
     def forward(self, z, batch):
@@ -95,8 +100,16 @@ class Decoder(nn.Module):
         dec = self.activation(dec)
         
         #dec = self.final_activation(self.out_fc(dec))
-        mu = self.final_activation_mu(self.out_mu(dec))
-        theta = self.final_activation_alpha(self.out_alpha(dec))
+        mu = self.fc5_mu(dec)
+        mu = self.bn5_mu(mu)
+        mu = self.activation(mu)
+        
+        theta = self.fc5_theta(dec)
+        theta = self.bn5_theta(theta)
+        theta = self.activation(theta)
+        
+        mu = self.final_activation_mu(self.out_mu(mu))
+        theta = self.final_activation_theta(self.out_alpha(theta))
         
         return mu, theta
 

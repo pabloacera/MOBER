@@ -92,7 +92,7 @@ def main():
         type = int,
         metavar = '',
         default = 3000,
-        help = 'Max number of training epochs, Default 15000. Eearly Stopping implemented.'
+        help = 'Max number of training epochs, Default 3000. Eearly Stopping implemented.'
     )
     tparser.add_argument(
         "--random_seed",
@@ -108,7 +108,7 @@ def main():
         type = float,
         default=1e-5,
         metavar = '',
-        help = 'Default 1e-6. Weight for KL loss.'
+        help = 'Default 1e-5. Weight for KL loss.'
     )
     
     tparser.add_argument(

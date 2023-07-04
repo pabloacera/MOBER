@@ -106,7 +106,7 @@ def train_model(model_BatchAE,
             src_pred = model_src_adv(enc)
 
             loss_src_adv = loss_function_classification(src_pred, batch, src_weights_src_adv)
-            #print(loss_src_adv, 'loss_src_adv')
+            print(loss_src_adv, 'loss_src_adv')
             
             loss_src_adv.backward(retain_graph=True)
             epoch_src_adv_loss += loss_src_adv.detach().item()
@@ -118,7 +118,7 @@ def train_model(model_BatchAE,
             # Update ae
             model_BatchAE.zero_grad()
             loss_ae = v_loss - args.src_adv_weight * loss_src_adv
-            #print(loss_ae, 'loss_ae')
+            print(loss_ae, 'loss_ae')
             loss_ae.backward()
             '''
             #Check for nan or inf/-inf values in the gradients
@@ -129,7 +129,7 @@ def train_model(model_BatchAE,
                     if torch.isinf(param.grad).any():
                         print(f'Gradient of {name} has inf or -inf values')
             '''
-                        
+            '''
             # Check if there is vanishing or exploding gradients
             max_grad_norm = None
             min_grad_norm = None
@@ -138,6 +138,7 @@ def train_model(model_BatchAE,
             for name, param in model_BatchAE.named_parameters():
                 if param.requires_grad:
                     grad_norm = param.grad.data.norm(2).item()
+                    #grad_norm = param.grad.item()
                     if max_grad_norm is None or grad_norm > max_grad_norm:
                         max_grad_norm = grad_norm
                     if min_grad_norm is None or grad_norm < min_grad_norm:
@@ -145,7 +146,29 @@ def train_model(model_BatchAE,
             
             print(f'Max Gradient Norm: {max_grad_norm}')
             print(f'Min Gradient Norm: {min_grad_norm}')
-
+            '''
+            # Initialize variables to store the maximum and minimum gradients
+            max_grad = None
+            min_grad = None
+            
+            # Calculate the gradients
+            for name, param in model_BatchAE.named_parameters():
+                if param.requires_grad:
+                    # Get the maximum and minimum values in the gradient for this parameter
+                    max_param_grad = param.grad.data.max().item()
+                    min_param_grad = param.grad.data.min().item()
+            
+                    # Update the overall maximum and minimum gradients if necessary
+                    if max_grad is None or max_param_grad > max_grad:
+                        max_grad = max_param_grad
+                    if min_grad is None or min_param_grad < min_grad:
+                        min_grad = min_param_grad
+            
+            print(f'Max Gradient: {max_grad}')
+            print(f'Min Gradient: {min_grad}')
+            # Now, max_grad and min_grad contain the maximum and minimum gr
+            
+            
             epoch_ae_loss += v_loss.detach().item()
             optimizer_BatchAE.step()
             

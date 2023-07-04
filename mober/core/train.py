@@ -146,7 +146,7 @@ def train_model(model_BatchAE,
             
             print(f'Max Gradient Norm: {max_grad_norm}')
             print(f'Min Gradient Norm: {min_grad_norm}')
-            '''
+            
             # Initialize variables to store the maximum and minimum gradients
             max_grad = None
             min_grad = None
@@ -167,8 +167,7 @@ def train_model(model_BatchAE,
             print(f'Max Gradient: {max_grad}')
             print(f'Min Gradient: {min_grad}')
             # Now, max_grad and min_grad contain the maximum and minimum gr
-            
-            
+            '''
             epoch_ae_loss += v_loss.detach().item()
             optimizer_BatchAE.step()
             

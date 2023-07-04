@@ -106,7 +106,7 @@ def train_model(model_BatchAE,
             src_pred = model_src_adv(enc)
 
             loss_src_adv = loss_function_classification(src_pred, batch, src_weights_src_adv)
-            print(loss_src_adv, 'loss_src_adv')
+            #print(loss_src_adv, 'loss_src_adv')
             
             loss_src_adv.backward(retain_graph=True)
             epoch_src_adv_loss += loss_src_adv.detach().item()
@@ -118,7 +118,7 @@ def train_model(model_BatchAE,
             # Update ae
             model_BatchAE.zero_grad()
             loss_ae = v_loss - args.src_adv_weight * loss_src_adv
-            print(loss_ae, 'loss_ae')
+            #print(loss_ae, 'loss_ae')
             loss_ae.backward()
             '''
             #Check for nan or inf/-inf values in the gradients

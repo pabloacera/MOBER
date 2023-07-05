@@ -191,10 +191,17 @@ def train_model(model_BatchAE,
             else:
                 waited_epochs += 1
                 if waited_epochs > args.patience: early_stop = True
+        
+        if epoch % 50 == 0:
+            model_utils.save_model(model_BatchAE, optimizer_BatchAE, epoch, epoch_ae_loss/len(train_loader.dataset)     ,ae_model_file , device)
+            model_utils.save_model(model_src_adv, optimizer_src_adv, epoch, epoch_src_adv_loss/len(train_loader.dataset),src_model_file, device)
                 
+    
     if args.val_set_size == 0: 
         model_utils.save_model(model_BatchAE, optimizer_BatchAE, epoch, epoch_ae_loss/len(train_loader.dataset)     ,ae_model_file , device)
         model_utils.save_model(model_src_adv, optimizer_src_adv, epoch, epoch_src_adv_loss/len(train_loader.dataset),src_model_file, device)
+    
+    
 
 
 def main(args):

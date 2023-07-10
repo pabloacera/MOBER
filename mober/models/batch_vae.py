@@ -72,14 +72,18 @@ class Decoder(nn.Module):
         self.bn5 = nn.BatchNorm1d(256, momentum=0.01, eps=0.001)
 
         #self.out_fc = nn.Linear(256, n_genes)
-        self.fc5_mu = nn.Linear(256, 512)
-        self.bn5_mu = nn.BatchNorm1d(512, momentum=0.01, eps=0.001)
+        self.fc5_mu1 = nn.Linear(256, 512)
+        self.bn5_mu1 = nn.BatchNorm1d(512, momentum=0.01, eps=0.001)
+        self.fc5_mu2 = nn.Linear(512, 1024)
+        self.bn5_mu2 = nn.BatchNorm1d(1024, momentum=0.01, eps=0.001)
         
-        self.fc5_theta = nn.Linear(256, 512)
-        self.bn5_theta = nn.BatchNorm1d(512, momentum=0.01, eps=0.001)
+        self.fc5_theta1 = nn.Linear(256, 512)
+        self.bn5_theta1 = nn.BatchNorm1d(512, momentum=0.01, eps=0.001)
+        self.fc5_theta2 = nn.Linear(512, 1024)
+        self.bn5_theta2 = nn.BatchNorm1d(1024, momentum=0.01, eps=0.001)
         
-        self.out_mu = nn.Linear(512, n_genes)
-        self.out_alpha = nn.Linear(512, n_genes)
+        self.out_mu = nn.Linear(1024, n_genes)
+        self.out_alpha = nn.Linear(1024, n_genes)
 
 
     def forward(self, z, batch):

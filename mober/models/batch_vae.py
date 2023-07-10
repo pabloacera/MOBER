@@ -104,13 +104,22 @@ class Decoder(nn.Module):
         dec = self.activation(dec)
         
         #dec = self.final_activation(self.out_fc(dec))
-        mu = self.fc5_mu(dec)
-        mu = self.bn5_mu(mu)
+        mu = self.fc5_mu1(dec)
+        mu = self.bn5_mu1(mu)
+        mu = self.activation(mu)
+
+        mu = self.fc5_mu2(mu)
+        mu = self.bn5_mu2(mu)
         mu = self.activation(mu)
         
-        theta = self.fc5_theta(dec)
-        theta = self.bn5_theta(theta)
+        theta = self.fc5_theta1(dec)
+        theta = self.bn5_theta1(theta)
         theta = self.activation(theta)
+        
+        theta = self.fc5_theta2(theta)
+        theta = self.bn5_theta2(theta)
+        theta = self.activation(theta)
+        
         
         mu = self.final_activation_mu(self.out_mu(mu))
         theta = self.final_activation_theta(self.out_alpha(theta))

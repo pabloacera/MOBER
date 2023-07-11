@@ -13,4 +13,5 @@ def loss_function_classification(pred, target, class_weights):
     :return: Weighted prediction loss. Summed for all the samples, not averaged.
     """
     loss_function = NLLLoss(weight=class_weights, reduction="none")
+    
     return loss_function(pred, torch.argmax(target, dim=1)).sum(dim=0)

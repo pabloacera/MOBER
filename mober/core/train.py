@@ -110,7 +110,7 @@ def train_model(model_BatchAE,
             
             loss_src_adv.backward(retain_graph=True)
             epoch_src_adv_loss += loss_src_adv.detach().item()
-            torch.nn.utils.clip_grad_norm_(model_src_adv.parameters(), max_norm=1)  # Gradient clipping for model_src_adv
+            #torch.nn.utils.clip_grad_norm_(model_src_adv.parameters(), max_norm=1)  # Gradient clipping for model_src_adv
             optimizer_src_adv.step()
 
             src_pred = model_src_adv(enc)
@@ -171,7 +171,7 @@ def train_model(model_BatchAE,
             # Now, max_grad and min_grad contain the maximum and minimum gr
             '''
             epoch_ae_loss += v_loss.detach().item()
-            torch.nn.utils.clip_grad_norm_(model_BatchAE.parameters(), max_norm=1)  # Gradient clipping for model_BatchAE
+            #torch.nn.utils.clip_grad_norm_(model_BatchAE.parameters(), max_norm=1)  # Gradient clipping for model_BatchAE
 
             optimizer_BatchAE.step()
             

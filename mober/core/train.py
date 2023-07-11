@@ -44,8 +44,8 @@ def validation(model_BatchAE,model_src_adv,val_loader,device, args, log, src_wei
     with torch.no_grad():
         for data, batch in val_loader:
 
-            data = data.to(device)
-            batch = batch.to(device)
+            data = data.to(device).double()
+            batch = batch.to(device).double()
             
             dec, enc, means, stdev = model_BatchAE(data, batch)
             v_loss = loss_function_vae(dec, data, means, stdev, kl_weight=args.kl_weight)
@@ -94,8 +94,8 @@ def train_model(model_BatchAE,
         model_BatchAE.train()
         model_src_adv.train()
         for data, batch in train_loader:
-            data = data.to(device)
-            batch = batch.to(device)
+            data = data.to(device).double()
+            batch = batch.to(device).double()
 
             dec, enc, means, stdev = model_BatchAE(data, batch)
             v_loss = loss_function_vae(dec, data, means, stdev, kl_weight=args.kl_weight)
@@ -110,7 +110,7 @@ def train_model(model_BatchAE,
             
             loss_src_adv.backward(retain_graph=True)
             epoch_src_adv_loss += loss_src_adv.detach().item()
-            torch.nn.utils.clip_grad_norm_(model_src_adv.parameters(), max_norm=10)  # Gradient clipping for model_src_adv
+            torch.nn.utils.clip_grad_norm_(model_src_adv.parameters(), max_norm=1)  # Gradient clipping for model_src_adv
             optimizer_src_adv.step()
 
             src_pred = model_src_adv(enc)
@@ -171,7 +171,7 @@ def train_model(model_BatchAE,
             # Now, max_grad and min_grad contain the maximum and minimum gr
             '''
             epoch_ae_loss += v_loss.detach().item()
-            torch.nn.utils.clip_grad_norm_(model_BatchAE.parameters(), max_norm=10)  # Gradient clipping for model_BatchAE
+            torch.nn.utils.clip_grad_norm_(model_BatchAE.parameters(), max_norm=1)  # Gradient clipping for model_BatchAE
 
             optimizer_BatchAE.step()
             
@@ -204,8 +204,6 @@ def train_model(model_BatchAE,
     if args.val_set_size == 0: 
         model_utils.save_model(model_BatchAE, optimizer_BatchAE, epoch, epoch_ae_loss/len(train_loader.dataset)     ,ae_model_file , device)
         model_utils.save_model(model_src_adv, optimizer_src_adv, epoch, epoch_src_adv_loss/len(train_loader.dataset),src_model_file, device)
-    
-    
 
 
 def main(args):
@@ -261,7 +259,7 @@ def main(args):
                                                                 filename=None)
     
     src_weights_src_adv = torch.tensor(
-        data_utils.get_class_weights(adata.obs.data_source, args.balanced_sources_src_adv), dtype=torch.float).to(device)
+        data_utils.get_class_weights(adata.obs.data_source, args.balanced_sources_src_adv), dtype=torch.float).to(device).double()
     
     
     train_model(model_BatchAE, 

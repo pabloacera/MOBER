@@ -28,7 +28,7 @@ def create_model(model_cls, device, *args, filename=None, lr=1e-3, **kwargs):
     if device.type == "cuda" and torch.cuda.device_count() > 1:
         print("Loading model on ", torch.cuda.device_count(), "GPUs")
         model = nn.DataParallel(model)
-    return model.to(device), optimizer
+    return model.to(device).double(), optimizer
 
 
 def save_model(model, optimizer, epoch, loss, filename, device):

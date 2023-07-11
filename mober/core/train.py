@@ -120,6 +120,7 @@ def train_model(model_BatchAE,
             loss_ae = v_loss - args.src_adv_weight * loss_src_adv
             #print(loss_ae, 'loss_ae')
             loss_ae.backward()
+            
             '''
             #Check for nan or inf/-inf values in the gradients
             for name, param in model_BatchAE.named_parameters():

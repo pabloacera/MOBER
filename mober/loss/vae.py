@@ -304,14 +304,14 @@ def loss_function_vae(dec, x, mu, stdev, kl_weight=1.0):
     
     #reconst_loss = functional.mse_loss(dec, x, reduction='none').mean(dim=1)
     
-    NB_NLL = negative_binomial_loss_mu_theta(dec, x).mean(dim=1)
-    #NB_NLL = negative_binomial_loss_mu_theta(dec, x).sum(dim=1)
+    #NB_NLL = negative_binomial_loss_mu_theta(dec, x).mean(dim=1)
+    NB_NLL = negative_binomial_loss_mu_theta(dec, x).sum(dim=1)
     #print(torch.isnan(NB_NLL).nonzero())
     
     #print((NB_NLL + kl_weight * KLD).sum(dim=0))
     
-    return (NB_NLL + kl_weight * KLD).sum(dim=0)
-    #return (NB_NLL + kl_weight * KLD).mean(dim=0)
+    #return (NB_NLL + kl_weight * KLD).sum(dim=0)
+    return (NB_NLL + kl_weight * KLD).mean(dim=0)
 
 
 

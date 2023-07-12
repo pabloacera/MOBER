@@ -122,54 +122,6 @@ def train_model(model_BatchAE,
             #print(loss_ae, 'loss_ae')
             loss_ae.backward()
             
-            '''
-            #Check for nan or inf/-inf values in the gradients
-            for name, param in model_BatchAE.named_parameters():
-                if param.grad is not None:
-                    if torch.isnan(param.grad).any():
-                        print(f'Gradient of {name} has nan values')
-                    if torch.isinf(param.grad).any():
-                        print(f'Gradient of {name} has inf or -inf values')
-            '''
-            '''
-            # Check if there is vanishing or exploding gradients
-            max_grad_norm = None
-            min_grad_norm = None
-            
-            # Calculate the gradients' norms
-            for name, param in model_BatchAE.named_parameters():
-                if param.requires_grad:
-                    grad_norm = param.grad.data.norm(2).item()
-                    #grad_norm = param.grad.item()
-                    if max_grad_norm is None or grad_norm > max_grad_norm:
-                        max_grad_norm = grad_norm
-                    if min_grad_norm is None or grad_norm < min_grad_norm:
-                        min_grad_norm = grad_norm
-            
-            print(f'Max Gradient Norm: {max_grad_norm}')
-            print(f'Min Gradient Norm: {min_grad_norm}')
-            
-            # Initialize variables to store the maximum and minimum gradients
-            max_grad = None
-            min_grad = None
-            
-            # Calculate the gradients
-            for name, param in model_BatchAE.named_parameters():
-                if param.requires_grad:
-                    # Get the maximum and minimum values in the gradient for this parameter
-                    max_param_grad = param.grad.data.max().item()
-                    min_param_grad = param.grad.data.min().item()
-            
-                    # Update the overall maximum and minimum gradients if necessary
-                    if max_grad is None or max_param_grad > max_grad:
-                        max_grad = max_param_grad
-                    if min_grad is None or min_param_grad < min_grad:
-                        min_grad = min_param_grad
-            
-            print(f'Max Gradient: {max_grad}')
-            print(f'Min Gradient: {min_grad}')
-            # Now, max_grad and min_grad contain the maximum and minimum gr
-            '''
             epoch_ae_loss += v_loss.detach().item()
             #torch.nn.utils.clip_grad_norm_(model_BatchAE.parameters(), max_norm=1)  # Gradient clipping for model_BatchAE
 
@@ -177,14 +129,15 @@ def train_model(model_BatchAE,
             
             epoch_tot_loss += loss_ae.detach().item()
             
-        log.log_metric("train_loss_NB_NLL" , epoch_ae_loss      / len(train_loader.dataset), epoch)
+        log.log_metric("train_loss_ae" , epoch_ae_loss      / len(train_loader.dataset), epoch)
         log.log_metric("train_loss_adv", epoch_src_adv_loss / len(train_loader.dataset), epoch)
         log.log_metric("train_loss_tot", epoch_tot_loss     / len(train_loader.dataset), epoch)
+        
         
         # Validation
         if args.val_set_size != 0:
             epoch_ae_loss_val = validation(model_BatchAE,model_src_adv,val_loader,device, args, log, src_weights_src_adv,epoch)
-            
+
             # Early stop
             if epoch_ae_loss_val < best_model_loss: # there is an improvement, update the best_val_loss and save the model
                 best_model_loss = epoch_ae_loss_val
@@ -195,12 +148,7 @@ def train_model(model_BatchAE,
             else:
                 waited_epochs += 1
                 if waited_epochs > args.patience: early_stop = True
-        
-        if epoch % 50 == 0:
-            model_utils.save_model(model_BatchAE, optimizer_BatchAE, epoch, epoch_ae_loss/len(train_loader.dataset)     ,ae_model_file , device)
-            model_utils.save_model(model_src_adv, optimizer_src_adv, epoch, epoch_src_adv_loss/len(train_loader.dataset),src_model_file, device)
                 
-    
     if args.val_set_size == 0: 
         model_utils.save_model(model_BatchAE, optimizer_BatchAE, epoch, epoch_ae_loss/len(train_loader.dataset)     ,ae_model_file , device)
         model_utils.save_model(model_src_adv, optimizer_src_adv, epoch, epoch_src_adv_loss/len(train_loader.dataset),src_model_file, device)
